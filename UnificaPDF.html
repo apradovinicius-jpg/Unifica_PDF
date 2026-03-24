@@ -75,8 +75,26 @@ h1{font-size:26px;font-weight:600;letter-spacing:-.5px}
 .btn-allt:hover{color:var(--tx);border-color:var(--br3)}
 .rng-tip{font-size:11px;color:var(--tx3)}
 .rng-tip kbd{background:var(--s2);border:1px solid var(--br2);border-radius:3px;padding:0 4px;font-family:'DM Mono',monospace;font-size:10px;color:var(--tx2)}
-#meta-panel{display:none;align-items:center;gap:12px;padding:12px 14px;background:var(--s1);border:1px solid var(--br);border-radius:var(--rs)}
-#meta-panel.v{display:flex}
+#meta-panel, #comp-panel{display:none;align-items:center;gap:12px;padding:12px 14px;background:var(--s1);border:1px solid var(--br);border-radius:var(--rs)}
+#meta-panel.v, #comp-panel.v{display:flex}
+#comp-panel{flex-direction:column;align-items:stretch;gap:16px}
+.comp-header{display:flex;align-items:center;gap:12px}
+.comp-body{display:none;flex-direction:column;gap:14px;padding-top:4px;border-top:1px solid var(--br)}
+.comp-body.v{display:flex}
+.comp-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.comp-row label{font-size:12px;color:var(--tx2);font-weight:500}
+.comp-mode{display:flex;background:var(--s2);padding:3px;border-radius:var(--rs);gap:2px}
+.comp-mode label{cursor:pointer;padding:4px 10px;border-radius:var(--rxs);font-size:11px;color:var(--tx3);transition:background .1s,color .1s}
+.comp-mode input{display:none}
+.comp-mode input:checked + span{background:var(--s3);color:var(--tx)}
+.comp-input-wrap{display:flex;align-items:center;gap:8px;flex:1}
+.comp-input-wrap input[type=range]{flex:1;height:4px;background:var(--s3);border-radius:2px;appearance:none;outline:none}
+.comp-input-wrap input[type=range]::-webkit-slider-thumb{appearance:none;width:14px;height:14px;background:var(--ac);border-radius:50%;cursor:pointer}
+.comp-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--ac);min-width:34px}
+.comp-input-wrap input[type=number]{width:64px;height:28px;background:var(--s2);border:1px solid var(--br2);border-radius:var(--rxs);color:var(--tx);font-family:'DM Mono',monospace;font-size:12px;padding:0 8px;outline:none}
+.comp-warn{font-size:11px;color:var(--tx3);display:flex;gap:6px;align-items:flex-start;line-height:1.4}
+.comp-warn svg{flex-shrink:0;margin-top:1px}
+
 .tog{position:relative;width:36px;height:20px;flex-shrink:0}
 .tog input{opacity:0;width:0;height:0}
 .tog-track{position:absolute;inset:0;background:var(--s3);border-radius:20px;cursor:pointer;transition:background .2s,border-color .2s;border:1px solid var(--br2)}
@@ -147,6 +165,46 @@ footer{margin-top:44px;font-size:11px;color:var(--tx3);text-align:center;opacity
     </div>
   </div>
 
+  <div id="comp-panel">
+    <div class="comp-header">
+      <label class="tog">
+        <input type="checkbox" id="comp-toggle">
+        <span class="tog-track"></span>
+      </label>
+      <div class="tog-info">
+        <span class="tog-lbl">Comprimir PDF</span>
+        <span class="tog-desc">Reduz o tamanho do arquivo final otimizando imagens</span>
+      </div>
+    </div>
+    <div id="comp-options" class="comp-body">
+      <div class="comp-row">
+        <label>Modo:</label>
+        <div class="comp-mode">
+          <label><input type="radio" name="comp-mode" value="free" checked><span>Qualidade Livre</span></label>
+          <label><input type="radio" name="comp-mode" value="target"><span>Tamanho Máximo</span></label>
+        </div>
+      </div>
+      <div id="row-free" class="comp-row">
+        <label>Qualidade:</label>
+        <div class="comp-input-wrap">
+          <input type="range" id="comp-quality" min="10" max="100" value="70">
+          <span class="comp-val" id="val-quality">70%</span>
+        </div>
+      </div>
+      <div id="row-target" class="comp-row" style="display:none">
+        <label>Tamanho final estimado até:</label>
+        <div class="comp-input-wrap">
+          <input type="number" id="comp-size" min="0.1" step="0.1" value="2.0">
+          <span class="comp-val">MB</span>
+        </div>
+      </div>
+      <div class="comp-warn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v4M7 9v.5M7 13A6 6 0 107 1a6 6 0 000 12z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span>A compressão transforma páginas em imagens. O texto não será selecionável.</span>
+      </div>
+    </div>
+  </div>
+
   <div id="actions">
     <button class="btn-merge" id="btn-merge">Unificar PDFs</button>
     <button class="btn-clr" id="btn-clr">Limpar</button>
@@ -174,6 +232,14 @@ const statusEl   = document.getElementById('status');
 const btnMerge   = document.getElementById('btn-merge');
 const btnClr     = document.getElementById('btn-clr');
 const metaToggle = document.getElementById('meta-toggle');
+const compPanel  = document.getElementById('comp-panel');
+const compToggle = document.getElementById('comp-toggle');
+const compOpts   = document.getElementById('comp-options');
+const compQual   = document.getElementById('comp-quality');
+const valQual    = document.getElementById('val-quality');
+const compSize   = document.getElementById('comp-size');
+const rowFree    = document.getElementById('row-free');
+const rowTarget  = document.getElementById('row-target');
 
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
@@ -181,6 +247,22 @@ dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.
 dropZone.addEventListener('click', () => fileInput.click());
 document.getElementById('browse-btn').addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
 fileInput.addEventListener('change', () => { handleFiles([...fileInput.files]); fileInput.value = ''; });
+
+compToggle.addEventListener('change', () => {
+  compOpts.classList.toggle('v', compToggle.checked);
+  renderFooterControls();
+});
+
+document.querySelectorAll('input[name="comp-mode"]').forEach(r => {
+  r.addEventListener('change', () => {
+    rowFree.style.display = r.value === 'free' ? 'flex' : 'none';
+    rowTarget.style.display = r.value === 'target' ? 'flex' : 'none';
+  });
+});
+
+compQual.addEventListener('input', () => {
+  valQual.textContent = compQual.value + '%';
+});
 
 async function handleFiles(incoming) {
   const pdfs = incoming.filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
@@ -191,7 +273,7 @@ async function handleFiles(incoming) {
       const buf = await f.arrayBuffer();
       const pdfDoc = await PDFLib.PDFDocument.load(buf.slice(0), { ignoreEncryption: true });
       const pages = pdfDoc.getPageCount();
-      const previewThumb = await generateThumb(buf, 1, 0.15);
+      const previewThumb = await generateThumb(buf.slice(0), 1, 0.15);
       files.push({
         id: 'f' + Date.now() + Math.random().toString(36).slice(2),
         name: f.name, size: f.size, pages, buf,
@@ -208,7 +290,7 @@ async function handleFiles(incoming) {
 }
 
 async function generateThumb(buf, pageNum, scale) {
-  const typed = new Uint8Array(buf.slice(0));
+  const typed = new Uint8Array(buf);
   const pdf = await pdfjsLib.getDocument({ data: typed }).promise;
   const page = await pdf.getPage(pageNum);
   const vp = page.getViewport({ scale });
@@ -431,39 +513,108 @@ function renderSummary() {
 }
 
 function renderFooterControls() {
-  metaPanel.className = files.length ? 'v' : '';
-  actionsEl.className = files.length >= 2 ? 'v' : '';
-  btnMerge.disabled = files.length < 2;
+  const hasFiles = files.length > 0;
+  metaPanel.className = hasFiles ? 'v' : '';
+  compPanel.className = hasFiles ? 'v' : '';
+
+  const canMerge = files.length >= 2;
+  const canCompress = hasFiles && compToggle.checked;
+
+  actionsEl.className = (canMerge || canCompress) ? 'v' : '';
+  btnMerge.disabled = !(canMerge || canCompress);
+
+  if (canCompress) {
+    btnMerge.textContent = files.length > 1 ? 'Unificar e Comprimir' : 'Comprimir PDF';
+  } else {
+    btnMerge.textContent = 'Unificar PDFs';
+  }
+}
+
+async function renderPageToJpeg(pdf, pageNum, scale, quality) {
+  const page = await pdf.getPage(pageNum);
+  const vp = page.getViewport({ scale });
+  const cv = document.createElement('canvas');
+  cv.width = Math.round(vp.width);
+  cv.height = Math.round(vp.height);
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, cv.width, cv.height);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  return new Promise(resolve => {
+    cv.toBlob(async blob => {
+      resolve(await blob.arrayBuffer());
+    }, 'image/jpeg', quality);
+  });
 }
 
 btnMerge.addEventListener('click', async () => {
-  if (files.length < 2) return;
+  const canMerge = files.length >= 2;
+  const canCompress = files.length > 0 && compToggle.checked;
+  if (!canMerge && !canCompress) return;
+
   btnMerge.disabled = true;
-  setStatus('loading', 'Unificando PDFs...');
+  setStatus('loading', canCompress ? 'Processando e comprimindo...' : 'Unificando PDFs...');
+
   try {
-    const merged = await PDFLib.PDFDocument.create();
+    let finalDoc;
+    if (canCompress) {
+      finalDoc = await PDFLib.PDFDocument.create();
+      const mode = document.querySelector('input[name="comp-mode"]:checked').value;
+      let scale = 1.5;
+      let quality = parseInt(compQual.value) / 100;
+
+      const totalPagesToProcess = files.reduce((s, f) => s + (f.endPage - f.startPage + 1), 0);
+
+      if (mode === 'target') {
+        const targetMB = parseFloat(compSize.value);
+        const kbPerPage = (targetMB * 1024) / totalPagesToProcess;
+        if (kbPerPage < 50) { scale = 0.8; quality = 0.3; }
+        else if (kbPerPage < 100) { scale = 1.0; quality = 0.5; }
+        else if (kbPerPage < 200) { scale = 1.2; quality = 0.7; }
+        else { scale = 1.5; quality = 0.8; }
+      }
+
+      let processed = 0;
+      for (const f of files) {
+        const typed = new Uint8Array(f.buf.slice(0));
+        const pdf = await pdfjsLib.getDocument({ data: typed }).promise;
+        for (let p = f.startPage; p <= f.endPage; p++) {
+          processed++;
+          setStatus('loading', `Processando página ${processed} de ${totalPagesToProcess}...`);
+          const imgBuf = await renderPageToJpeg(pdf, p, scale, quality);
+          const img = await finalDoc.embedJpg(imgBuf);
+          const page = finalDoc.addPage([img.width, img.height]);
+          page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
+        }
+        await pdf.destroy();
+      }
+    } else {
+      finalDoc = await PDFLib.PDFDocument.create();
+      for (const f of files) {
+        const doc = await PDFLib.PDFDocument.load(f.buf.slice(0), { ignoreEncryption: true });
+        const indices = [];
+        for (let p = f.startPage - 1; p < f.endPage; p++) indices.push(p);
+        const pages = await finalDoc.copyPages(doc, indices);
+        pages.forEach(p => finalDoc.addPage(p));
+      }
+    }
+
     if (metaToggle.checked) {
-      merged.setTitle(''); merged.setAuthor(''); merged.setSubject('');
-      merged.setKeywords([]); merged.setProducer(''); merged.setCreator('');
-      merged.setCreationDate(new Date()); merged.setModificationDate(new Date());
+      finalDoc.setTitle(''); finalDoc.setAuthor(''); finalDoc.setSubject('');
+      finalDoc.setKeywords([]); finalDoc.setProducer(''); finalDoc.setCreator('');
+      finalDoc.setCreationDate(new Date()); finalDoc.setModificationDate(new Date());
     }
-    for (const f of files) {
-      const doc = await PDFLib.PDFDocument.load(f.buf.slice(0), { ignoreEncryption: true });
-      const indices = [];
-      for (let p = f.startPage - 1; p < f.endPage; p++) indices.push(p);
-      const pages = await merged.copyPages(doc, indices);
-      pages.forEach(p => merged.addPage(p));
-    }
-    const bytes = await merged.save({ useObjectStreams: true });
+
+    const bytes = await finalDoc.save({ useObjectStreams: true });
     const blob = new Blob([bytes], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'unificado_' + ts() + '.pdf';
+    a.download = (canCompress ? 'comprimido_' : 'unificado_') + ts() + '.pdf';
     a.click();
     URL.revokeObjectURL(url);
     const sp = files.reduce((s, f) => s + (f.endPage - f.startPage + 1), 0);
-    setStatus('success', '✓ ' + files.length + ' arquivos · ' + sp + ' paginas · ' + fmtSize(bytes.length));
+    setStatus('success', '✓ ' + (canCompress ? 'Comprimido' : 'Unificado') + ': ' + files.length + ' arq. · ' + sp + ' pág. · ' + fmtSize(bytes.length));
     setTimeout(clearStatus, 7000);
   } catch (err) {
     setStatus('error', 'Erro ao unificar: ' + err.message);
