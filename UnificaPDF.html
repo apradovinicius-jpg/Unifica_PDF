@@ -586,7 +586,8 @@ $('btn-main').onclick = async () => {
                 }
             }
             if (metaOff) { merged.setTitle(''); merged.setAuthor(''); }
-            output.push({ name: `${baseName}.pdf`, bytes: await merged.save() });
+            const name = userFileName ? `${userFileName}.pdf` : `unificado_${ts()}.pdf`;
+            output.push({ name, bytes: await merged.save() });
         } else {
             // Split
             for (const f of files) {
