@@ -1,26 +1,32 @@
-# PDF Master v.2
+# PDF Master v.3
 
-Ferramenta local e segura para manipulação de PDFs diretamente no navegador. 100% privado, nenhum arquivo é enviado a servidores.
+Ferramenta profissional local e segura para manipulação de PDFs diretamente no navegador. 100% privado, nenhum arquivo sai do seu computador.
 
 ## Funcionalidades
 - **Unificar PDFs**: Combine vários arquivos em um único documento.
-- **Separar PDFs**: Processe múltiplos arquivos e receba-os individualmente (em um pacote ZIP).
-- **Seleção de Páginas**: Escolha intervalos específicos de cada PDF.
-- **Remover Metadados**: Limpe informações como autor, título e histórico.
-- **Compressão Otimizada**:
-  - **Qualidade Livre**: Ajuste manual da qualidade das imagens.
-  - **Tamanho Máximo**: Estime o tamanho final desejado.
-  - **Tons de Cinza**: Opção para converter em P&B, mantendo melhor nitidez em tamanhos menores.
-- **Personalização**: Escolha o nome do arquivo final.
-- **Interface Moderna**: Layout focado em UX, com miniaturas e reordenação por arraste.
+- **Separar PDFs (Advanced)**:
+  - **Por Intervalos**: Extraia múltiplos intervalos de páginas (ex: 1-5, 10, 15-20) de cada arquivo.
+  - **Páginas Individuais**: Transforme cada página em um arquivo PDF separado.
+  - Receba múltiplos resultados organizados em um pacote ZIP.
+- **Seleção Flexível**: Suporte a strings de intervalo complexas.
+- **Remover Metadados**: Limpe informações sensíveis e histórico do documento.
+- **Compressão de Alta Performance**:
+  - **Qualidade Livre**: Ajuste manual de 10% a 100%.
+  - **Tamanho Máximo**: Heurística inteligente que prioriza a legibilidade.
+  - **Modo Grayscale**: Converta para tons de cinza para manter maior nitidez em tamanhos reduzidos.
+- **Interface Moderna v3**:
+  - Design responsivo e elegante (Inter font, Indigo theme).
+  - Suporte total a **Modo Claro** e **Modo Escuro**.
+  - Notificações Toast para feedback em tempo real.
+- **Personalização**: Defina o nome base para seus arquivos de saída.
 
-## Tecnologias Usadas
-- [pdf-lib](https://pdf-lib.js.org/) - Manipulação de documentos PDF.
-- [pdf.js](https://mozilla.github.io/pdf.js/) - Renderização e rasterização de páginas.
-- [JSZip](https://stuk.github.io/jszip/) - Criação de pacotes ZIP para múltiplos arquivos.
+## Tecnologias
+- [pdf-lib](https://pdf-lib.js.org/)
+- [pdf.js](https://mozilla.github.io/pdf.js/)
+- [JSZip](https://stuk.github.io/jszip/)
 
-## Como Usar
-Basta abrir o arquivo `UnificaPDF.html` em qualquer navegador moderno, arrastar seus arquivos e configurar as opções desejadas.
+## Desenvolvido por
+**Vinicius Prado**
 
 ---
-*Criado por Software Engineer Agent*
+*Processamento 100% local no navegador.*
