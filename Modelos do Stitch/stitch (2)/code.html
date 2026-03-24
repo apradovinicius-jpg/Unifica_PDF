@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cofre Obsidian - PDF Master v3</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&amp;family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "emerald-vibrant": "#00E676",
+              "electric-blue": "#42A5F5",
+              "on-tertiary-container": "#424400",
+              "inverse-on-surface": "#283044",
+              "on-background": "#dae2fc",
+              "surface-tint": "#00E676",
+              "on-primary-container": "#00391c",
+              "primary-fixed": "#99ffc2",
+              "error": "#ffb4ab",
+              "primary-fixed-dim": "#7cf4a7",
+              "secondary-fixed": "#a0c9ff",
+              "primary": "#00E676",
+              "surface-bright": "#31394d",
+              "on-surface-variant": "#cec3d2",
+              "tertiary": "#ccd048",
+              "tertiary-fixed": "#e6ea5f",
+              "background": "#0b1325",
+              "secondary-container": "#42A5F5",
+              "on-tertiary": "#313300",
+              "primary-container": "#00E676",
+              "outline-variant": "#4b4451",
+              "on-primary-fixed-variant": "#00522a",
+              "outline": "#978d9c",
+              "on-secondary-fixed-variant": "#004a77",
+              "surface-container-lowest": "#060e20",
+              "on-primary-fixed": "#00210c",
+              "inverse-primary": "#006d37",
+              "on-surface": "#dae2fc",
+              "on-primary": "#00391c",
+              "tertiary-container": "#b0b42e",
+              "surface-container": "#171f32",
+              "on-error-container": "#ffdad6",
+              "on-secondary-container": "#d1e4ff",
+              "on-secondary-fixed": "#001d35",
+              "on-secondary": "#003254",
+              "surface-dim": "#0b1325",
+              "surface": "#0b1325",
+              "on-error": "#690005",
+              "surface-variant": "#2d3448",
+              "secondary-fixed-dim": "#42A5F5",
+              "secondary": "#42A5F5",
+              "inverse-surface": "#dae2fc",
+              "on-tertiary-fixed-variant": "#484a00",
+              "surface-container-low": "#131b2e",
+              "surface-container-highest": "#2d3448",
+              "on-tertiary-fixed": "#1c1d00",
+              "surface-container-high": "#222a3d",
+              "error-container": "#93000a",
+              "tertiary-fixed-dim": "#c9cd46"
+            },
+            fontFamily: {
+              "headline": ["Orbitron"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style type="text/tailwindcss">
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-panel {
+        background: rgba(19, 27, 46, 0.6);
+        backdrop-filter: blur(20px);
+      }
+      .vault-glow {
+        box-shadow: 0 0 40px rgba(0, 230, 118, 0.1);
+      }
+      .noise-texture {
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        opacity: 0.03;
+        pointer-events: none;
+      }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-emerald-vibrant/30 min-h-screen">
+<div class="noise-texture fixed inset-0 z-0"></div>
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-16 bg-[#0b1325]/60 backdrop-blur-xl">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black text-[#00E676] drop-shadow-[0_0_8px_rgba(0,230,118,0.4)] font-headline">Cofre Obsidian</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-[#00E676] border-b-2 border-[#00E676] pb-1 font-headline font-bold tracking-tight text-sm" href="#">Documentos</a>
+<a class="text-[#dae2fc]/60 font-headline font-bold tracking-tight text-sm hover:text-[#00E676] hover:bg-[#222a3d]/50 transition-all scale-95 duration-200 ease-in-out px-3 py-1 rounded-lg" href="#">Histórico</a>
+<a class="text-[#dae2fc]/60 font-headline font-bold tracking-tight text-sm hover:text-[#00E676] hover:bg-[#222a3d]/50 transition-all scale-95 duration-200 ease-in-out px-3 py-1 rounded-lg" href="#">Segurança</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-[#dae2fc]/60 hover:text-[#00E676] transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-[#dae2fc]/60 hover:text-[#00E676] transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="Conta do Usuário" class="w-full h-full object-cover" data-alt="professional male portrait with high tech glasses in a dark atmospheric security room with purple lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3u3hooT_hJqgK748SR9qxbVFoZKnjBnBI-JpBWmS4S-TFQ0Jp4TZD4vyW2KAgXcIb0eFGQPcIrGstG9I5QLcSXYQucNiT-vY4kn7ezziBgi4-CLJJJDScbZe6esuGwV7rXgDi1mb4XuUm-VUIo1Lak1bwhSRYp3yw7Haz51gkacovpL0wQxIaOtZrWjS7rpi_LPTPWCN2j2Qmb-UyUJwtFeb9GFjU63Z-XFvRpNTjeompd-iiS5BwFMxQ2m4vblCyu04X1Yo5_PlU"/>
+</div>
+</div>
+</nav>
+<aside class="fixed left-0 top-0 h-full flex flex-col p-4 z-40 bg-[#131b2e] w-64 shadow-xl shadow-black/20 pt-20">
+<div class="flex items-center gap-3 mb-10 px-2">
+<div class="w-10 h-10 bg-surface-container-high rounded-xl flex items-center justify-center text-[#00E676]">
+<span class="material-symbols-outlined" data-icon="lock" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<div>
+<h2 class="font-headline font-bold text-[#00E676] text-xs leading-tight">O Cofre</h2>
+<p class="font-body font-medium text-[10px] text-[#dae2fc]/50 uppercase tracking-widest">Processamento Seguro</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 bg-[#222a3d] text-[#42A5F5] rounded-xl font-bold shadow-[inset_0_0_10px_rgba(66,165,245,0.1)] translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="font-body text-sm">Todos Arquivos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#dae2fc]/70 hover:bg-[#2d3448] hover:text-[#dae2fc] rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="call_merge">call_merge</span>
+<span class="font-body text-sm">Mesclar PDF</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#dae2fc]/70 hover:bg-[#2d3448] hover:text-[#dae2fc] rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="call_split">call_split</span>
+<span class="font-body text-sm">Dividir PDF</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#dae2fc]/70 hover:bg-[#2d3448] hover:text-[#dae2fc] rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="compress">compress</span>
+<span class="font-body text-sm">Comprimir</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#dae2fc]/70 hover:bg-[#2d3448] hover:text-[#dae2fc] rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="font-body text-sm">Criptografar</span>
+</a>
+</nav>
+<div class="mt-auto space-y-2 border-t border-outline-variant/10 pt-4">
+<button class="w-full bg-gradient-to-br from-[#00E676] to-[#42A5F5] text-[#0b1325] font-headline font-bold py-3 rounded-xl mb-4 shadow-lg shadow-emerald-vibrant/20 hover:scale-[1.02] transition-transform text-xs">
+            Upgrade para Pro
+        </button>
+<a class="flex items-center gap-3 px-4 py-2 text-[#dae2fc]/70 hover:text-[#42A5F5] transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-body text-xs">Suporte</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-[#dae2fc]/70 hover:text-[#42A5F5] transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-body text-xs">Minha Conta</span>
+</a>
+</div>
+</aside>
+<main class="ml-64 pt-20 pb-20 px-8 grid grid-cols-12 gap-8 relative z-10">
+<div class="col-span-12 lg:col-span-8 space-y-8">
+<div class="glass-panel vault-glow border border-primary/10 rounded-2xl p-12 flex flex-col items-center justify-center text-center group transition-all duration-500 hover:border-primary/30">
+<div class="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center mb-6 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-tr from-[#00E676]/20 to-[#42A5F5]/20 animate-pulse"></div>
+<span class="material-symbols-outlined text-[#00E676] text-4xl relative z-10" data-icon="upload_file">upload_file</span>
+</div>
+<h1 class="text-3xl font-headline font-extrabold text-on-surface mb-2 tracking-tight">Solte seus PDFs aqui</h1>
+<p class="text-on-surface-variant font-body max-w-md mx-auto">Carregue documentos sensíveis para processamento local de alta velocidade. Seus dados nunca saem do cofre criptografado.</p>
+<button class="mt-8 px-8 py-3 bg-surface-container-highest border border-outline-variant/20 rounded-xl font-headline font-bold text-[#00E676] hover:bg-[#00E676] hover:text-[#0b1325] transition-all text-sm">
+                Selecionar Arquivos
+            </button>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between px-2">
+<h3 class="font-headline font-bold text-lg text-on-surface">Fila <span class="text-[#42A5F5] text-sm font-normal ml-2">2 Arquivos Prontos</span></h3>
+<button class="text-sm font-label text-[#00E676] hover:underline">Limpar Tudo</button>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl flex items-center gap-4 group hover:bg-surface-container-high transition-colors">
+<div class="w-12 h-12 bg-[#00E676]/10 rounded-lg flex items-center justify-center text-[#00E676]">
+<span class="material-symbols-outlined" data-icon="picture_as_pdf">picture_as_pdf</span>
+</div>
+<div class="flex-1">
+<h4 class="font-headline font-semibold text-on-surface text-sm">Relatorio_Financeiro_2023_Q4.pdf</h4>
+<div class="flex items-center gap-3 mt-1">
+<span class="text-[10px] font-label uppercase tracking-wider text-on-surface-variant/60">4.2 MB</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant/40"></span>
+<span class="flex items-center gap-1 text-[10px] font-bold text-[#42A5F5] uppercase tracking-widest">
+<span class="w-1.5 h-1.5 rounded-full bg-[#42A5F5]"></span> Seguro
+                        </span>
+</div>
+</div>
+<button class="p-2 opacity-0 group-hover:opacity-100 text-error transition-opacity">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl flex items-center gap-4 group hover:bg-surface-container-high transition-colors">
+<div class="w-12 h-12 bg-[#00E676]/10 rounded-lg flex items-center justify-center text-[#00E676]">
+<span class="material-symbols-outlined" data-icon="picture_as_pdf">picture_as_pdf</span>
+</div>
+<div class="flex-1">
+<h4 class="font-headline font-semibold text-on-surface text-sm">Contrato_Juridico_v2.pdf</h4>
+<div class="flex items-center gap-3 mt-1">
+<span class="text-[10px] font-label uppercase tracking-wider text-on-surface-variant/60">1.8 MB</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant/40"></span>
+<span class="flex items-center gap-1 text-[10px] font-bold text-[#42A5F5] uppercase tracking-widest">
+<span class="w-1.5 h-1.5 rounded-full bg-[#42A5F5]"></span> Seguro
+                        </span>
+</div>
+</div>
+<button class="p-2 opacity-0 group-hover:opacity-100 text-error transition-opacity">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/10">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-[#42A5F5]" data-icon="tune">tune</span>
+<h2 class="font-headline font-bold text-lg text-on-surface">Centro de Controle</h2>
+</div>
+<div class="space-y-6">
+<div class="p-4 bg-surface-container-high rounded-xl space-y-4">
+<label class="font-headline font-bold text-[10px] uppercase tracking-widest text-[#42A5F5]">Configuração de Saída</label>
+<div class="flex items-center justify-between">
+<span class="text-sm font-medium text-on-surface">Compressão Sem Perdas</span>
+<button class="w-10 h-5 bg-[#42A5F5]/20 rounded-full relative flex items-center px-1">
+<div class="w-3.5 h-3.5 bg-[#42A5F5] rounded-full shadow-[0_0_8px_rgba(66,165,245,0.6)]"></div>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm font-medium text-on-surface">Preservar Metadados</span>
+<button class="w-10 h-5 bg-surface-container-highest border border-outline-variant/30 rounded-full relative flex items-center px-1">
+<div class="w-3.5 h-3.5 bg-outline-variant rounded-full"></div>
+</button>
+</div>
+</div>
+<div class="p-4 bg-surface-container-high rounded-xl space-y-4">
+<label class="font-headline font-bold text-[10px] uppercase tracking-widest text-[#42A5F5]">Segurança do Cofre</label>
+<div class="flex items-center justify-between">
+<span class="text-sm font-medium text-on-surface">Criptografia Ponta-a-Ponta</span>
+<button class="w-10 h-5 bg-[#42A5F5]/20 rounded-full relative flex items-center px-1">
+<div class="w-3.5 h-3.5 bg-[#42A5F5] rounded-full shadow-[0_0_8px_rgba(66,165,245,0.6)]"></div>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm font-medium text-on-surface">Auto-Destruir ao Fechar</span>
+<button class="w-10 h-5 bg-[#42A5F5]/20 rounded-full relative flex items-center justify-end px-1">
+<div class="w-3.5 h-3.5 bg-[#42A5F5] rounded-full shadow-[0_0_8px_rgba(66,165,245,0.6)]"></div>
+</button>
+</div>
+</div>
+<div class="pt-4">
+<button class="w-full h-16 bg-gradient-to-r from-[#00E676] to-[#42A5F5] rounded-xl font-headline font-black text-[#0b1325] uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-emerald-vibrant/10 hover:brightness-110 transition-all active:scale-95">
+<span class="material-symbols-outlined" data-icon="auto_fix_high">auto_fix_high</span>
+                        Unificar PDFs
+                    </button>
+<p class="text-[10px] text-center mt-4 font-label text-on-surface-variant/60 uppercase tracking-tighter">
+                        O processamento começará instantaneamente usando recursos locais
+                    </p>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/10 overflow-hidden relative">
+<div class="relative z-10">
+<h3 class="font-headline font-bold text-sm text-on-surface mb-4">Capacidade do Cofre</h3>
+<div class="w-full h-3 bg-surface-container-highest rounded-full overflow-hidden mb-2">
+<div class="h-full w-[65%] bg-gradient-to-r from-[#42A5F5] to-[#00E676] shadow-[0_0_10px_rgba(66,165,245,0.4)]"></div>
+</div>
+<div class="flex justify-between text-[10px] font-label text-on-surface-variant uppercase">
+<span>Disco Local: 24.2 GB Livres</span>
+<span class="text-[#42A5F5] font-bold">65% Seguro</span>
+</div>
+</div>
+<div class="absolute inset-0 opacity-10 scale-150 rotate-12 -z-0">
+<img alt="tech abstrato" class="w-full h-full object-cover" data-alt="close up of a high tech mechanical vault door gears and plates with cyan and purple light highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmh1XiJggHmfTiqd5G3ET1vjC8MNUwsHzew1NGBrWBr7Y68aqgHGScuNWteZXTtTVeCTLE1-oAhZqgqMQmkOXtSN1lk8AObHIy_XjY-ozlR5KGCGY-qjP360NhS6F0AJN_wzkf-e-lb2cXJlgpY1PP12kGMQfSdPdsL-K6d8g-R6eFvg20bawChGdnDPqI2xzHyanZj06YINvhwrNfPtzklGKAy-spffVWFclgOiKvB7OLhmk6Yp3LrXdyv3eueCg_U83hmdjTJPs3"/>
+</div>
+</div>
+</div>
+</main>
+<footer class="fixed bottom-0 w-full flex justify-between items-center px-8 py-3 z-50 ml-64 bg-[#060e20] text-[#42A5F5] font-body text-[10px] uppercase tracking-widest">
+<div class="flex items-center gap-6">
+<span>© 2024 Obsidian PDF. Processamento 100% Local. Nenhum dado sai do cofre.</span>
+</div>
+<div class="flex items-center gap-6">
+<a class="text-[#dae2fc]/40 hover:text-[#42A5F5] transition-colors opacity-80 hover:opacity-100" href="#">Privacidade</a>
+<a class="text-[#dae2fc]/40 hover:text-[#42A5F5] transition-colors opacity-80 hover:opacity-100" href="#">Auditoria</a>
+<a class="text-[#dae2fc]/40 hover:text-[#42A5F5] transition-colors opacity-80 hover:opacity-100" href="#">Termos</a>
+</div>
+</footer>
+
+</body></html>
