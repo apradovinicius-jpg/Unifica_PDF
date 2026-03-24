@@ -6,6 +6,7 @@
 <title>Unifica PDF</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -133,9 +134,9 @@ footer{margin-top:44px;font-size:11px;color:var(--tx3);text-align:center;opacity
         <path d="M6 10h6M6 12.5h4" stroke="#0d0d0e" stroke-width="1.4" stroke-linecap="round"/>
       </svg>
     </div>
-    <h1>Unifica PDF</h1>
+    <h1>PDF Master v.2</h1>
   </div>
-  <p class="tagline">Miniaturas · Seleção de páginas · Remover metadados · 100% local</p>
+  <p class="tagline">Unificar · Separar · Comprimir · Local & Seguro</p>
 </header>
 
 <div class="main">
@@ -153,6 +154,23 @@ footer{margin-top:44px;font-size:11px;color:var(--tx3);text-align:center;opacity
 
   <div id="summary-bar"></div>
   <div id="file-list"></div>
+
+  <div id="output-config" style="display:none; flex-direction:column; gap:11px;">
+    <div class="comp-row" style="background:var(--s1); padding:12px 14px; border:1px solid var(--br); border-radius:var(--rs);">
+      <label>Nome do arquivo final:</label>
+      <div class="comp-input-wrap">
+        <input type="text" id="final-name" placeholder="(opcional) exemplo: meu-documento" style="background:var(--s2); border:1px solid var(--br2); border-radius:var(--rxs); color:var(--tx); padding:6px 10px; font-size:13px; flex:1; outline:none;">
+      </div>
+    </div>
+
+    <div class="comp-row" style="background:var(--s1); padding:12px 14px; border:1px solid var(--br); border-radius:var(--rs);">
+      <label>Modo de saída:</label>
+      <div class="comp-mode" id="output-mode-selector">
+        <label><input type="radio" name="out-mode" value="merge" checked><span>Unificar tudo</span></label>
+        <label><input type="radio" name="out-mode" value="split"><span>Separar por arquivos</span></label>
+      </div>
+    </div>
+  </div>
 
   <div id="meta-panel">
     <label class="tog">
@@ -198,6 +216,16 @@ footer{margin-top:44px;font-size:11px;color:var(--tx3);text-align:center;opacity
           <span class="comp-val">MB</span>
         </div>
       </div>
+      <div class="comp-row">
+        <label class="tog" style="width:30px; height:16px;">
+          <input type="checkbox" id="comp-gray">
+          <span class="tog-track"></span>
+        </label>
+        <div class="tog-info">
+          <span class="tog-lbl" style="font-size:12px;">Forçar Tons de Cinza</span>
+          <span class="tog-desc" style="font-size:10px;">Melhora nitidez em compressões agressivas (p&b)</span>
+        </div>
+      </div>
       <div class="comp-warn">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v4M7 9v.5M7 13A6 6 0 107 1a6 6 0 000 12z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         <span>A compressão transforma páginas em imagens. O texto não será selecionável.</span>
@@ -213,7 +241,11 @@ footer{margin-top:44px;font-size:11px;color:var(--tx3);text-align:center;opacity
   <div id="status"></div>
 </div>
 
-<footer>Processamento 100% no navegador · Nenhum arquivo é enviado a servidores</footer>
+<footer>
+  <p>PDF Master v.2 · Criado por <b>Software Engineer Agent</b></p>
+  <p style="margin-top:4px;">Tecnologias: pdf-lib · pdf.js · JSZip · DM Sans</p>
+  <p style="margin-top:10px; opacity:0.8;">Processamento 100% no navegador · Nenhum arquivo é enviado a servidores</p>
+</footer>
 
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -232,6 +264,8 @@ const statusEl   = document.getElementById('status');
 const btnMerge   = document.getElementById('btn-merge');
 const btnClr     = document.getElementById('btn-clr');
 const metaToggle = document.getElementById('meta-toggle');
+const outConfig  = document.getElementById('output-config');
+const finalName  = document.getElementById('final-name');
 const compPanel  = document.getElementById('comp-panel');
 const compToggle = document.getElementById('comp-toggle');
 const compOpts   = document.getElementById('comp-options');
@@ -240,6 +274,7 @@ const valQual    = document.getElementById('val-quality');
 const compSize   = document.getElementById('comp-size');
 const rowFree    = document.getElementById('row-free');
 const rowTarget  = document.getElementById('row-target');
+const compGray   = document.getElementById('comp-gray');
 
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
@@ -516,21 +551,32 @@ function renderFooterControls() {
   const hasFiles = files.length > 0;
   metaPanel.className = hasFiles ? 'v' : '';
   compPanel.className = hasFiles ? 'v' : '';
+  outConfig.style.display = hasFiles ? 'flex' : 'none';
 
+  const outMode = document.querySelector('input[name="out-mode"]:checked').value;
   const canMerge = files.length >= 2;
   const canCompress = hasFiles && compToggle.checked;
+  const canSplit = hasFiles && outMode === 'split';
 
-  actionsEl.className = (canMerge || canCompress) ? 'v' : '';
-  btnMerge.disabled = !(canMerge || canCompress);
+  actionsEl.className = (canMerge || canCompress || canSplit) ? 'v' : '';
+  btnMerge.disabled = !(canMerge || canCompress || canSplit);
 
-  if (canCompress) {
-    btnMerge.textContent = files.length > 1 ? 'Unificar e Comprimir' : 'Comprimir PDF';
+  if (outMode === 'split') {
+    btnMerge.textContent = canCompress ? 'Comprimir e Separar' : 'Separar PDF';
   } else {
-    btnMerge.textContent = 'Unificar PDFs';
+    if (canCompress) {
+      btnMerge.textContent = files.length > 1 ? 'Unificar e Comprimir' : 'Comprimir PDF';
+    } else {
+      btnMerge.textContent = 'Unificar PDFs';
+    }
   }
 }
 
-async function renderPageToJpeg(pdf, pageNum, scale, quality) {
+document.querySelectorAll('input[name="out-mode"]').forEach(r => {
+  r.addEventListener('change', renderFooterControls);
+});
+
+async function renderPageToJpeg(pdf, pageNum, scale, quality, gray) {
   const page = await pdf.getPage(pageNum);
   const vp = page.getViewport({ scale });
   const cv = document.createElement('canvas');
@@ -539,6 +585,11 @@ async function renderPageToJpeg(pdf, pageNum, scale, quality) {
   const ctx = cv.getContext('2d');
   ctx.fillStyle = '#fff';
   ctx.fillRect(0, 0, cv.width, cv.height);
+
+  if (gray) {
+    ctx.filter = 'grayscale(100%) contrast(1.1)';
+  }
+
   await page.render({ canvasContext: ctx, viewport: vp }).promise;
   return new Promise(resolve => {
     cv.toBlob(async blob => {
@@ -548,73 +599,138 @@ async function renderPageToJpeg(pdf, pageNum, scale, quality) {
 }
 
 btnMerge.addEventListener('click', async () => {
-  const canMerge = files.length >= 2;
+  const outMode = document.querySelector('input[name="out-mode"]:checked').value;
+  const canMerge = files.length >= 2 && outMode === 'merge';
   const canCompress = files.length > 0 && compToggle.checked;
-  if (!canMerge && !canCompress) return;
+  const canSplit = files.length > 0 && outMode === 'split';
+
+  if (!canMerge && !canCompress && !canSplit) return;
 
   btnMerge.disabled = true;
-  setStatus('loading', canCompress ? 'Processando e comprimindo...' : 'Unificando PDFs...');
+  setStatus('loading', canCompress ? 'Processando e comprimindo...' : 'Processando PDFs...');
 
   try {
-    let finalDoc;
+    const isGray = compGray.checked;
+    const isMetaOff = metaToggle.checked;
+    const userFileName = finalName.value.trim();
+    const baseName = userFileName || (outMode === 'merge' ? 'unificado' : 'separado');
+
+    let compressionParams = null;
     if (canCompress) {
-      finalDoc = await PDFLib.PDFDocument.create();
       const mode = document.querySelector('input[name="comp-mode"]:checked').value;
       let scale = 1.5;
       let quality = parseInt(compQual.value) / 100;
-
       const totalPagesToProcess = files.reduce((s, f) => s + (f.endPage - f.startPage + 1), 0);
 
       if (mode === 'target') {
         const targetMB = parseFloat(compSize.value);
         const kbPerPage = (targetMB * 1024) / totalPagesToProcess;
-        if (kbPerPage < 50) { scale = 0.8; quality = 0.3; }
-        else if (kbPerPage < 100) { scale = 1.0; quality = 0.5; }
-        else if (kbPerPage < 200) { scale = 1.2; quality = 0.7; }
-        else { scale = 1.5; quality = 0.8; }
+        if (kbPerPage < 40) { scale = 1.0; quality = 0.2; }
+        else if (kbPerPage < 70) { scale = 1.2; quality = 0.4; }
+        else if (kbPerPage < 150) { scale = 1.5; quality = 0.6; }
+        else { scale = 2.0; quality = 0.7; }
       }
+      compressionParams = { scale, quality };
+    }
 
-      let processed = 0;
+    const outputFiles = [];
+    let totalProcessedPages = 0;
+    const totalToProcess = files.reduce((s, f) => s + (f.endPage - f.startPage + 1), 0);
+
+    if (outMode === 'merge') {
+      const mergedDoc = await PDFLib.PDFDocument.create();
       for (const f of files) {
-        const typed = new Uint8Array(f.buf.slice(0));
-        const pdf = await pdfjsLib.getDocument({ data: typed }).promise;
-        for (let p = f.startPage; p <= f.endPage; p++) {
-          processed++;
-          setStatus('loading', `Processando página ${processed} de ${totalPagesToProcess}...`);
-          const imgBuf = await renderPageToJpeg(pdf, p, scale, quality);
-          const img = await finalDoc.embedJpg(imgBuf);
-          const page = finalDoc.addPage([img.width, img.height]);
-          page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
+        if (canCompress) {
+          const typed = new Uint8Array(f.buf.slice(0));
+          const pdf = await pdfjsLib.getDocument({ data: typed }).promise;
+          for (let p = f.startPage; p <= f.endPage; p++) {
+            totalProcessedPages++;
+            setStatus('loading', `Processando página ${totalProcessedPages} de ${totalToProcess}...`);
+            const imgBuf = await renderPageToJpeg(pdf, p, compressionParams.scale, compressionParams.quality, isGray);
+            const img = await mergedDoc.embedJpg(imgBuf);
+            const page = mergedDoc.addPage([img.width, img.height]);
+            page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
+          }
+          await pdf.destroy();
+        } else {
+          const doc = await PDFLib.PDFDocument.load(f.buf.slice(0), { ignoreEncryption: true });
+          const indices = [];
+          for (let p = f.startPage - 1; p < f.endPage; p++) indices.push(p);
+          const pages = await mergedDoc.copyPages(doc, indices);
+          pages.forEach(p => mergedDoc.addPage(p));
+          totalProcessedPages += indices.length;
         }
-        await pdf.destroy();
       }
+      if (isMetaOff) {
+        mergedDoc.setTitle(''); mergedDoc.setAuthor(''); mergedDoc.setSubject('');
+        mergedDoc.setKeywords([]); mergedDoc.setProducer(''); mergedDoc.setCreator('');
+        mergedDoc.setCreationDate(new Date()); mergedDoc.setModificationDate(new Date());
+      }
+      const bytes = await mergedDoc.save({ useObjectStreams: true });
+      outputFiles.push({ name: baseName + '_' + ts() + '.pdf', bytes });
     } else {
-      finalDoc = await PDFLib.PDFDocument.create();
-      for (const f of files) {
-        const doc = await PDFLib.PDFDocument.load(f.buf.slice(0), { ignoreEncryption: true });
-        const indices = [];
-        for (let p = f.startPage - 1; p < f.endPage; p++) indices.push(p);
-        const pages = await finalDoc.copyPages(doc, indices);
-        pages.forEach(p => finalDoc.addPage(p));
+      // Split mode
+      for (let i = 0; i < files.size || i < files.length; i++) {
+        const f = files[i];
+        const splitDoc = await PDFLib.PDFDocument.create();
+        if (canCompress) {
+          const typed = new Uint8Array(f.buf.slice(0));
+          const pdf = await pdfjsLib.getDocument({ data: typed }).promise;
+          for (let p = f.startPage; p <= f.endPage; p++) {
+            totalProcessedPages++;
+            setStatus('loading', `Processando arquivo ${i+1}/${files.length}, pág ${p}...`);
+            const imgBuf = await renderPageToJpeg(pdf, p, compressionParams.scale, compressionParams.quality, isGray);
+            const img = await splitDoc.embedJpg(imgBuf);
+            const page = splitDoc.addPage([img.width, img.height]);
+            page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
+          }
+          await pdf.destroy();
+        } else {
+          const doc = await PDFLib.PDFDocument.load(f.buf.slice(0), { ignoreEncryption: true });
+          const indices = [];
+          for (let p = f.startPage - 1; p < f.endPage; p++) indices.push(p);
+          const pages = await splitDoc.copyPages(doc, indices);
+          pages.forEach(p => splitDoc.addPage(p));
+          totalProcessedPages += indices.length;
+        }
+        if (isMetaOff) {
+          splitDoc.setTitle(''); splitDoc.setAuthor(''); splitDoc.setSubject('');
+          splitDoc.setKeywords([]); splitDoc.setProducer(''); splitDoc.setCreator('');
+          splitDoc.setCreationDate(new Date()); splitDoc.setModificationDate(new Date());
+        }
+        const bytes = await splitDoc.save({ useObjectStreams: true });
+        let name = f.name.toLowerCase().replace('.pdf', '') + '_edit.pdf';
+        if (userFileName) {
+          name = userFileName + (files.length > 1 ? '_' + (i + 1) : '') + '.pdf';
+        }
+        outputFiles.push({ name, bytes });
       }
     }
 
-    if (metaToggle.checked) {
-      finalDoc.setTitle(''); finalDoc.setAuthor(''); finalDoc.setSubject('');
-      finalDoc.setKeywords([]); finalDoc.setProducer(''); finalDoc.setCreator('');
-      finalDoc.setCreationDate(new Date()); finalDoc.setModificationDate(new Date());
+    if (outputFiles.length === 1) {
+      const file = outputFiles[0];
+      const blob = new Blob([file.bytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      a.click();
+      URL.revokeObjectURL(url);
+      setStatus('success', `✓ Pronto: ${file.name} (${fmtSize(file.bytes.length)})`);
+    } else {
+      setStatus('loading', 'Criando pacote ZIP...');
+      const zip = new JSZip();
+      outputFiles.forEach(f => zip.file(f.name, f.bytes));
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = baseName + '_' + ts() + '.zip';
+      a.click();
+      URL.revokeObjectURL(url);
+      const totalBytes = outputFiles.reduce((s, f) => s + f.bytes.length, 0);
+      setStatus('success', `✓ Pronto: ZIP com ${outputFiles.length} arquivos (${fmtSize(totalBytes)})`);
     }
-
-    const bytes = await finalDoc.save({ useObjectStreams: true });
-    const blob = new Blob([bytes], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = (canCompress ? 'comprimido_' : 'unificado_') + ts() + '.pdf';
-    a.click();
-    URL.revokeObjectURL(url);
-    const sp = files.reduce((s, f) => s + (f.endPage - f.startPage + 1), 0);
-    setStatus('success', '✓ ' + (canCompress ? 'Comprimido' : 'Unificado') + ': ' + files.length + ' arq. · ' + sp + ' pág. · ' + fmtSize(bytes.length));
     setTimeout(clearStatus, 7000);
   } catch (err) {
     setStatus('error', 'Erro ao unificar: ' + err.message);
